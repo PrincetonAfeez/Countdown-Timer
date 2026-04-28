@@ -115,3 +115,16 @@ class QuitCommand(Command):
 
     def execute(self, engine: TimerEngine, state: AppState) -> None:
         state.shutdown_requested = True
+
+def default_command_registry() -> dict[str, Command]:
+    return {
+        "p": PauseResumeCommand(),
+        "r": ResetCommand(),
+        "a": AddCommand(),
+        "d": DeleteCommand(),
+        "+": AdjustCommand(subtract=False),
+        "-": AdjustCommand(subtract=True),
+        "n": NextCommand(),
+        "?": HelpCommand(),
+        "q": QuitCommand(),
+    }
