@@ -43,3 +43,32 @@ class TimerApp:
         self._stop_input = threading.Event()
         self.engine.events.subscribe(TimerCompleted, self._on_completed)
         self.engine.events.subscribe(TimerCancelled, self._on_cancelled)
+
+
+    def run(self) -> None:
+        self._start_next_pending_if_idle()
+        previous_handlers = self._install_signal_handlers()
+        input_thread = threading.Thread(target=self._read_input, name="pytimer-input", daemon=True)
+        input_thread.start()
+
+        try:
+            with raw_terminal():
+                while True:
+                    tick_started_at = time.monotonic()
+                    self._drain_keys()
+                    self.engine.tick()
+                    self._start_next_pending_if_idle()
+                    self._render()
+
+                    if self.state.shutdown_requested:
+                        self._cancel_open_timers()
+                        break
+                    if self._all_timers_terminal():
+                        break
+
+                    sleep_until_next_tick(tick_started_at, 1 / self.tick_rate_hz)
+        finally:
+            self._stop_input.set()
+            input_thread.join(timeout=1.0)
+            self._restore_signal_handlers(previous_handlers)
+            self.display.close()
