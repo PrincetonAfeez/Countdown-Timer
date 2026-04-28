@@ -130,3 +130,26 @@ class TimerApp:
         self.notifier.notify(event.timer)
         self.session_log.append(event.timer, status=TimerStatus.COMPLETED)
 
+    def _on_cancelled(self, event: TimerCancelled) -> None:
+        self.session_log.append(event.timer, status=TimerStatus.CANCELLED)
+
+    def _install_signal_handlers(self) -> dict[signal.Signals, SignalHandler]:
+        previous: dict[signal.Signals, SignalHandler] = {}
+
+        def request_shutdown(signum: int, frame: FrameType | None) -> None:
+            self.state.shutdown_requested = True
+
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            try:
+                previous[signum] = signal.getsignal(signum)
+                signal.signal(signum, request_shutdown)
+            except (ValueError, AttributeError):
+                continue
+        return previous
+
+    def _restore_signal_handlers(
+        self,
+        previous: dict[signal.Signals, SignalHandler],
+    ) -> None:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
