@@ -149,3 +149,15 @@ def _active_timer_id(engine: TimerEngine, state: AppState) -> str | None:
             return timer.id
     return None
 
+
+def _select_next(engine: TimerEngine, state: AppState) -> None:
+    timers = engine.list_timers()
+    if not timers:
+        state.active_timer_id = None
+        return
+    ids = [timer.id for timer in timers]
+    if state.active_timer_id not in ids:
+        state.active_timer_id = ids[0]
+        return
+    index = ids.index(state.active_timer_id)
+    state.active_timer_id = ids[(index + 1) % len(ids)]
