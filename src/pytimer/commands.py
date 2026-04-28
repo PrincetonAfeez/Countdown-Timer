@@ -39,3 +39,15 @@ class PauseResumeCommand(Command):
             engine.pause(timer_id)
         elif timer.status == TimerStatus.PAUSED:
             engine.resume(timer_id)
+
+class ResetCommand(Command):
+    description = "reset active timer"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        timer_id = _active_timer_id(engine, state)
+        if timer_id is None:
+            return
+        engine.reset(timer_id)
+        engine.start(timer_id)
+
+
