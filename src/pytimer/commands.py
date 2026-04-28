@@ -134,3 +134,18 @@ def render_help(commands: dict[str, Command]) -> str:
     for key, command in commands.items():
         rows.append(f"{key:>2}  {command.description}")
     return "\n".join(rows)
+
+
+def _active_timer_id(engine: TimerEngine, state: AppState) -> str | None:
+    if state.active_timer_id is not None:
+        try:
+            engine.get_timer(state.active_timer_id)
+            return state.active_timer_id
+        except TimerNotFoundError:
+            state.active_timer_id = None
+    for timer in engine.list_timers():
+        if timer.status in {TimerStatus.RUNNING, TimerStatus.PAUSED, TimerStatus.PENDING}:
+            state.active_timer_id = timer.id
+            return timer.id
+    return None
+
