@@ -1,3 +1,5 @@
+"""Interactive timer loop."""
+
 from __future__ import annotations
 
 import queue
@@ -21,6 +23,7 @@ SignalHandler = Callable[[int, FrameType | None], object] | int | None
 
 
 class TimerApp:
+    """The timer application"""
     def __init__(
         self,
         engine: TimerEngine,
@@ -44,8 +47,8 @@ class TimerApp:
         self.engine.events.subscribe(TimerCompleted, self._on_completed)
         self.engine.events.subscribe(TimerCancelled, self._on_cancelled)
 
-
     def run(self) -> None:
+        """Run the timer app"""
         self._start_next_pending_if_idle()
         previous_handlers = self._install_signal_handlers()
         input_thread = threading.Thread(target=self._read_input, name="pytimer-input", daemon=True)
@@ -74,14 +77,15 @@ class TimerApp:
             self.display.close()
 
     def _render(self) -> None:
+        """Render the timers and help text"""
         now = self.engine.time_source.monotonic()
         rendered = self.renderer.render(self.engine.list_timers(), now)
         if self.state.show_help:
             rendered = f"{rendered}\n\n{render_help(self.commands)}"
         self.display.render(rendered)
 
-
     def _drain_keys(self) -> None:
+        """Drain the keys from the queue"""
         while True:
             try:
                 key = self._keys.get_nowait()
@@ -92,6 +96,7 @@ class TimerApp:
                 command.execute(self.engine, self.state)
 
     def _read_input(self) -> None:
+        """Read input from the terminal"""
         while not self._stop_input.is_set():
             try:
                 key = read_key_nonblocking()
@@ -103,6 +108,7 @@ class TimerApp:
             time.sleep(0.02)
 
     def _start_next_pending_if_idle(self) -> None:
+        """Start the next pending timer if all timers are idle"""
         timers = self.engine.list_timers()
         if any(timer.status in {TimerStatus.RUNNING, TimerStatus.PAUSED} for timer in timers):
             return
@@ -113,6 +119,7 @@ class TimerApp:
                 return
 
     def _cancel_open_timers(self) -> None:
+        """Cancel all open timers"""
         for timer in self.engine.list_timers():
             if timer.status in {TimerStatus.PENDING, TimerStatus.RUNNING, TimerStatus.PAUSED}:
                 try:
@@ -121,19 +128,23 @@ class TimerApp:
                     continue
 
     def _all_timers_terminal(self) -> bool:
+        """Check if all timers are terminal"""
         timers = self.engine.list_timers()
         return bool(timers) and all(
             timer.status in {TimerStatus.COMPLETED, TimerStatus.CANCELLED} for timer in timers
         )
 
     def _on_completed(self, event: TimerCompleted) -> None:
+        """Handle the timer completed event"""
         self.notifier.notify(event.timer)
         self.session_log.append(event.timer, status=TimerStatus.COMPLETED)
 
     def _on_cancelled(self, event: TimerCancelled) -> None:
+        """Handle the timer cancelled event"""
         self.session_log.append(event.timer, status=TimerStatus.CANCELLED)
 
     def _install_signal_handlers(self) -> dict[signal.Signals, SignalHandler]:
+        """Install the signal handlers"""
         previous: dict[signal.Signals, SignalHandler] = {}
 
         def request_shutdown(signum: int, frame: FrameType | None) -> None:
@@ -151,5 +162,6 @@ class TimerApp:
         self,
         previous: dict[signal.Signals, SignalHandler],
     ) -> None:
+        """Restore the signal handlers"""
         for signum, handler in previous.items():
             signal.signal(signum, handler)
