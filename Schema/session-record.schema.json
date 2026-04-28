@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/pytimer/session-record.schema.json",
+  "title": "pytimer sessions.jsonl record",
+  "description": "Schema for each JSON object line in ~/.pytimer/sessions.jsonl.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["label", "duration_ms", "duration", "status", "completed_at"],
+  "properties": {
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable label for the timer."
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Original timer duration in milliseconds."
+    },
+    "duration": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\d+(?:ms|s|m|h)(?:\\d+(?:ms|s|m|h))*$",
+      "description": "Compact duration string saved by the app."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "cancelled"],
+      "description": "Final timer status written to the log."
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp for when the timer ended."
+    }
+  },
+  "examples": [
+    {
+      "label": "tea",
+      "duration_ms": 240000,
+      "duration": "4m",
+      "status": "completed",
+      "completed_at": "2026-04-27T18:30:00+00:00"
+    }
+  ]
+}

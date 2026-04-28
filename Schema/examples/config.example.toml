@@ -1,0 +1,6 @@
+tick_rate_hz = 10.0
+renderer = "big"
+notifiers = ["bell"]
+color_scheme = "default"
+parser_order = ["compact", "colon", "natural"]
+bell_volume = 1.0
