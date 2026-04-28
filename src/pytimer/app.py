@@ -90,3 +90,15 @@ class TimerApp:
             command = self.commands.get(key)
             if command is not None:
                 command.execute(self.engine, self.state)
+
+    def _read_input(self) -> None:
+        while not self._stop_input.is_set():
+            try:
+                key = read_key_nonblocking()
+            except KeyboardInterrupt:
+                self.state.shutdown_requested = True
+                return
+            if key:
+                self._keys.put(key)
+            time.sleep(0.02)
+
