@@ -128,3 +128,9 @@ def default_command_registry() -> dict[str, Command]:
         "?": HelpCommand(),
         "q": QuitCommand(),
     }
+
+def render_help(commands: dict[str, Command]) -> str:
+    rows = ["Keybindings", "-----------"]
+    for key, command in commands.items():
+        rows.append(f"{key:>2}  {command.description}")
+    return "\n".join(rows)
