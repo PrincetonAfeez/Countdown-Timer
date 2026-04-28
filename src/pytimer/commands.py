@@ -98,3 +98,9 @@ class AdjustCommand(Command):
         except (InvalidStateTransitionError, ValueError):
             return
 
+class NextCommand(Command):
+    description = "select next timer"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        _select_next(engine, state)
+
