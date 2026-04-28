@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pytimer-countdown"
+version = "0.1.0"
+description = "A terminal countdown timer demonstrating clean Python architecture."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Countdown Timer" }]
+dependencies = []
+
+[project.optional-dependencies]
+desktop = ["plyer>=2.1"]
+dev = [
+  "hypothesis>=6.100",
+  "mypy>=1.8",
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+pytimer = "pytimer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pytimer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/pytimer"]
+
