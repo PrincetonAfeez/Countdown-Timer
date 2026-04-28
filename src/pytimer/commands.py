@@ -110,3 +110,8 @@ class HelpCommand(Command):
     def execute(self, engine: TimerEngine, state: AppState) -> None:
         state.show_help = not state.show_help
 
+class QuitCommand(Command):
+    description = "quit"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        state.shutdown_requested = True
