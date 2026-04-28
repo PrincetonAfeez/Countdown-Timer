@@ -25,3 +25,17 @@ class Command(ABC):
     def execute(self, engine: TimerEngine, state: AppState) -> None:
         
 
+class PauseResumeCommand(Command):
+    description = "pause/resume active timer"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        timer_id = _active_timer_id(engine, state)
+        if timer_id is None:
+            return
+        timer = engine.get_timer(timer_id)
+        if timer.status == TimerStatus.PENDING:
+            engine.start(timer_id)
+        elif timer.status == TimerStatus.RUNNING:
+            engine.pause(timer_id)
+        elif timer.status == TimerStatus.PAUSED:
+            engine.resume(timer_id)
