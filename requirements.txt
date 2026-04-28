@@ -1,0 +1,2 @@
+# Runtime dependencies for pytimer-countdown.
+# This project currently has no mandatory third-party runtime dependencies.
