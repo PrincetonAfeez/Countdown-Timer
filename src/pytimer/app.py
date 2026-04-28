@@ -79,3 +79,14 @@ class TimerApp:
         if self.state.show_help:
             rendered = f"{rendered}\n\n{render_help(self.commands)}"
         self.display.render(rendered)
+
+
+    def _drain_keys(self) -> None:
+        while True:
+            try:
+                key = self._keys.get_nowait()
+            except queue.Empty:
+                return
+            command = self.commands.get(key)
+            if command is not None:
+                command.execute(self.engine, self.state)
