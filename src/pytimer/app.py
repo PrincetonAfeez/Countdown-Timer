@@ -72,3 +72,10 @@ class TimerApp:
             input_thread.join(timeout=1.0)
             self._restore_signal_handlers(previous_handlers)
             self.display.close()
+
+    def _render(self) -> None:
+        now = self.engine.time_source.monotonic()
+        rendered = self.renderer.render(self.engine.list_timers(), now)
+        if self.state.show_help:
+            rendered = f"{rendered}\n\n{render_help(self.commands)}"
+        self.display.render(rendered)
