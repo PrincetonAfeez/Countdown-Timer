@@ -61,3 +61,13 @@ class ResetCommand(Command):
         engine.reset(timer_id)
         engine.start(timer_id)
 
+class AddCommand(Command):
+    description = "add a 5 minute timer"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        label = f"timer {len(engine.list_timers()) + 1}"
+        timer = engine.add_timer(state.default_add_duration, label=label)
+        state.active_timer_id = timer.id
+        if not any(existing.status == TimerStatus.RUNNING for existing in engine.list_timers()):
+            engine.start(timer.id)
+
