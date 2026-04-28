@@ -120,3 +120,8 @@ class TimerApp:
                 except InvalidStateTransitionError:
                     continue
 
+    def _all_timers_terminal(self) -> bool:
+        timers = self.engine.list_timers()
+        return bool(timers) and all(
+            timer.status in {TimerStatus.COMPLETED, TimerStatus.CANCELLED} for timer in timers
+        )
