@@ -71,3 +71,15 @@ class AddCommand(Command):
         if not any(existing.status == TimerStatus.RUNNING for existing in engine.list_timers()):
             engine.start(timer.id)
 
+class DeleteCommand(Command):
+    description = "cancel active timer"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        timer_id = _active_timer_id(engine, state)
+        if timer_id is None:
+            return
+        try:
+            engine.cancel(timer_id)
+        except InvalidStateTransitionError:
+            return
+        _select_next(engine, state)
