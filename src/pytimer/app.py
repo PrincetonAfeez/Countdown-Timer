@@ -102,3 +102,13 @@ class TimerApp:
                 self._keys.put(key)
             time.sleep(0.02)
 
+    def _start_next_pending_if_idle(self) -> None:
+        timers = self.engine.list_timers()
+        if any(timer.status in {TimerStatus.RUNNING, TimerStatus.PAUSED} for timer in timers):
+            return
+        for timer in timers:
+            if timer.status == TimerStatus.PENDING:
+                self.engine.start(timer.id)
+                self.state.active_timer_id = timer.id
+                return
+
