@@ -112,3 +112,11 @@ class TimerApp:
                 self.state.active_timer_id = timer.id
                 return
 
+    def _cancel_open_timers(self) -> None:
+        for timer in self.engine.list_timers():
+            if timer.status in {TimerStatus.PENDING, TimerStatus.RUNNING, TimerStatus.PAUSED}:
+                try:
+                    self.engine.cancel(timer.id)
+                except InvalidStateTransitionError:
+                    continue
+
