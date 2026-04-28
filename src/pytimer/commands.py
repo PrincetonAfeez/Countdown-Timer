@@ -104,3 +104,9 @@ class NextCommand(Command):
     def execute(self, engine: TimerEngine, state: AppState) -> None:
         _select_next(engine, state)
 
+class HelpCommand(Command):
+    description = "toggle help"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        state.show_help = not state.show_help
+
