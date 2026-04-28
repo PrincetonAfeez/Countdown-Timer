@@ -83,3 +83,18 @@ class DeleteCommand(Command):
         except InvalidStateTransitionError:
             return
         _select_next(engine, state)
+
+class AdjustCommand(Command):
+    def __init__(self, subtract: bool) -> None:
+        self.subtract = subtract
+        self.description = "subtract 30 seconds" if subtract else "add 30 seconds"
+
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        timer_id = _active_timer_id(engine, state)
+        if timer_id is None:
+            return
+        try:
+            engine.adjust(timer_id, state.adjust_step, subtract=self.subtract)
+        except (InvalidStateTransitionError, ValueError):
+            return
+
