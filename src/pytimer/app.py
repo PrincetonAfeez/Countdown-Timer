@@ -125,3 +125,8 @@ class TimerApp:
         return bool(timers) and all(
             timer.status in {TimerStatus.COMPLETED, TimerStatus.CANCELLED} for timer in timers
         )
+
+    def _on_completed(self, event: TimerCompleted) -> None:
+        self.notifier.notify(event.timer)
+        self.session_log.append(event.timer, status=TimerStatus.COMPLETED)
+
