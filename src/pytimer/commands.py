@@ -17,3 +17,11 @@ class AppState:
     default_add_duration: Duration = field(default_factory=lambda: Duration.from_seconds(5 * 60))
     adjust_step: Duration = field(default_factory=lambda: Duration.from_seconds(30))
 
+
+class Command(ABC):
+    description: str
+
+    @abstractmethod
+    def execute(self, engine: TimerEngine, state: AppState) -> None:
+        
+
